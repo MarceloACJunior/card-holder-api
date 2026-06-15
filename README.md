@@ -17,26 +17,50 @@ Permite criar e gerenciar **CardHolders** (portadores) e seus **cartões de cré
 
 ### Opção 1 — Docker Compose (recomendado)
 
-Sobe todos os serviços do ecossistema de uma vez. Ver [README raiz](../README.md).
+Sobe o banco e os 3 microsserviços de uma vez. Os repositórios `client-api` e `credit-analysis-api` devem estar clonados como pastas irmãs deste:
+
+```
+../client-api/
+../credit-analysis-api/
+../card-holder-api/   ← este repositório
+```
+
+```bash
+docker-compose up --build
+```
+
+**Parar tudo:**
+```bash
+docker-compose down
+```
+
+**Parar e apagar os dados do banco:**
+```bash
+docker-compose down -v
+```
+
+Na primeira execução o Maven baixa as dependências dentro dos containers — pode levar alguns minutos.
 
 ### Opção 2 — Local
 
 **Pré-requisitos:** Java 17+, Docker, `credit-analysis-api` rodando na porta 9001.
 
 ```bash
-# 1. Subir o banco PostgreSQL (porta 5434)
-docker-compose up -d
+# 1. Subir o banco PostgreSQL com um único container (porta 5432)
+docker run -d --name postgres \
+  -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=senha123 -e POSTGRES_DB=postgres \
+  -p 5432:5432 postgres:16-alpine
 
-# 2. Criar as tabelas
-docker cp database/ddl.sql postgres-card-holder:/tmp/ddl.sql
-docker exec postgres-card-holder psql -U admin -d postgres -f /tmp/ddl.sql
+# 2. Criar database e tabelas
+docker exec postgres psql -U admin -d postgres -c "CREATE DATABASE carddb;"
+docker exec -i postgres psql -U admin -d carddb < database/ddl.sql
 
 # 3. Iniciar a aplicação
 ./mvnw spring-boot:run      # Linux/Mac
 mvnw.cmd spring-boot:run    # Windows
 
 # Parar o banco
-docker-compose down
+docker stop postgres && docker rm postgres
 ```
 
 A API fica disponível em `http://localhost:9002`.
@@ -91,7 +115,7 @@ Content-Type: application/json
 
 ## Banco de dados
 
-Schema em `database/ddl.sql`. PostgreSQL na porta `5434`, usuário `admin`, senha `senha123`, banco `postgres`.
+Schema em `database/ddl.sql`. PostgreSQL na porta `5432`, usuário `admin`, senha `senha123`, banco `carddb`.
 
 ## Testes
 

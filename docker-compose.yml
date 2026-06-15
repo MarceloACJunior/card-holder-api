@@ -1,15 +1,66 @@
 services:
-  postgres:
-    image: postgres
-    container_name: postgres-card-holder
+
+  # ── Banco de dados ────────────────────────────────────────────────────────────
+
+  db:
+    image: postgres:16-alpine
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: senha123
+      POSTGRES_DB: postgres
     ports:
-      - "5434:5432"
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - ./db-init:/docker-entrypoint-initdb.d
+      - ../client-api/data/ddl.sql:/ddl/client.sql
+      - ../credit-analysis-api/database/ddl.sql:/ddl/credit.sql
+      - ./database/ddl.sql:/ddl/card.sql
 
-  adminer:
-    image: adminer
-    restart: always
+  # ── Microsserviços ───────────────────────────────────────────────────────────
+
+  client-api:
+    build: ../client-api
     ports:
-      - "9003:8080"
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/clientdb
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: senha123
+    depends_on:
+      db:
+        condition: service_healthy
+
+  credit-analysis-api:
+    build: ../credit-analysis-api
+    ports:
+      - "9001:9001"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/creditdb
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: senha123
+      CLIENT_API_URL: http://client-api:8080/v1.0/clients
+    depends_on:
+      db:
+        condition: service_healthy
+      client-api:
+        condition: service_started
+
+  card-holder-api:
+    build: .
+    ports:
+      - "9002:9002"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/carddb
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: senha123
+      CREDIT_ANALYSIS_API_URL: http://credit-analysis-api:9001/credit/analysis
+    depends_on:
+      db:
+        condition: service_healthy
+      credit-analysis-api:
+        condition: service_started
