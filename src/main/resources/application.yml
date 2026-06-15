@@ -6,6 +6,8 @@ spring:
 
   cloud:
     openfeign:
+      circuitbreaker:
+        enabled: true
       client:
         config:
           creditAnalysisClient:
@@ -34,6 +36,22 @@ spring:
     generate-ddl: false
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        # Erros de negócio 4xx do downstream não devem abrir o circuito
+        ignore-exceptions:
+          - feign.FeignException$FeignClientException
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 4s
 
 credit:
   analysis:

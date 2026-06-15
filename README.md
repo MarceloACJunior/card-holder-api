@@ -10,6 +10,7 @@ Permite criar e gerenciar **CardHolders** (portadores) e seus **cartões de cré
 
 - **Java 17** + **Spring Boot 3.1.0**
 - **Spring Cloud OpenFeign** — comunicação com `credit-analysis-api`
+- **Resilience4j (Circuit Breaker)** — proteção da chamada ao `credit-analysis-api`
 - **Spring Data JPA** + **PostgreSQL**
 - **MapStruct** | **Lombok** | **JUnit 5** + **Mockito**
 
@@ -17,13 +18,15 @@ Permite criar e gerenciar **CardHolders** (portadores) e seus **cartões de cré
 
 ### Opção 1 — Docker Compose (recomendado)
 
-Sobe o banco e os 3 microsserviços de uma vez. Os repositórios `client-api` e `credit-analysis-api` devem estar clonados como pastas irmãs deste:
+Sobe os bancos (PostgreSQL + MongoDB) e os 3 microsserviços de uma vez. Os repositórios `client-api` e `credit-analysis-api` devem estar clonados como pastas irmãs deste:
 
 ```
 ../client-api/
 ../credit-analysis-api/
-../card-holder-api/   ← este repositório
+../card-holder-api/   ← este repositório (orquestra tudo)
 ```
+
+> A orquestração usa **PostgreSQL** (`client-api` e `card-holder-api`) e **MongoDB** (`credit-analysis-api`).
 
 ```bash
 docker-compose up --build
@@ -112,6 +115,12 @@ Content-Type: application/json
 - **CVV:** entre 100 e 999
 - **Vencimento:** 5 anos a partir da emissão
 - **Limite disponível:** limite total do portador menos a soma dos limites dos cartões ativos
+
+## Resiliência
+
+A chamada ao `credit-analysis-api` é protegida por um **circuit breaker (Resilience4j)** integrado ao OpenFeign.
+Se o `credit-analysis-api` estiver fora do ar, após o limiar de falhas o circuito abre e a criação de
+CardHolder responde **`503 Service Unavailable`** rapidamente, em vez de pendurar a requisição até o timeout.
 
 ## Banco de dados
 

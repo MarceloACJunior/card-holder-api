@@ -18,8 +18,17 @@ services:
     volumes:
       - ./db-init:/docker-entrypoint-initdb.d
       - ../client-api/data/ddl.sql:/ddl/client.sql
-      - ../credit-analysis-api/database/ddl.sql:/ddl/credit.sql
       - ./database/ddl.sql:/ddl/card.sql
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   # ── Microsserviços ───────────────────────────────────────────────────────────
 
@@ -40,12 +49,10 @@ services:
     ports:
       - "9001:9001"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/creditdb
-      SPRING_DATASOURCE_USERNAME: admin
-      SPRING_DATASOURCE_PASSWORD: senha123
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/creditdb
       CLIENT_API_URL: http://client-api:8080/v1.0/clients
     depends_on:
-      db:
+      mongo:
         condition: service_healthy
       client-api:
         condition: service_started
