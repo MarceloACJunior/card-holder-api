@@ -34,3 +34,8 @@ spring:
     generate-ddl: false
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+credit:
+  analysis:
+    api:
+      url: http://localhost:9001/credit/analysis
