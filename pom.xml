@@ -8,7 +8,7 @@
 		<version>3.1.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.jazztech</groupId>
+	<groupId>com.cardapp</groupId>
 	<artifactId>card-holder-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>card-holder-api</name>
@@ -140,14 +140,14 @@
 				<version>0.8.10</version>
 				<configuration>
 					<excludes>
-						<exclude>com/jazztech/cardholderapi/apiclient/**</exclude>
-						<exclude>com/jazztech/cardholderapi/**/*MapperImpl.*</exclude>
-						<exclude>com/jazztech/cardholderapi/**/utils/**</exclude>
-						<exclude>com/jazztech/cardholderapi/**/model/**</exclude>
-						<exclude>com/jazztech/cardholderapi/**/controller/**</exclude>
-						<exclude>com/jazztech/cardholderapi/**/repository/**</exclude>
-						<exclude>com/jazztech/cardholderapi/**/handler/**</exclude>
-						<exclude>com/jazztech/cardholderapi/CardHolderApiApplication.class</exclude>
+						<exclude>com/cardapp/cardholderapi/apiclient/**</exclude>
+						<exclude>com/cardapp/cardholderapi/**/*MapperImpl.*</exclude>
+						<exclude>com/cardapp/cardholderapi/**/utils/**</exclude>
+						<exclude>com/cardapp/cardholderapi/**/model/**</exclude>
+						<exclude>com/cardapp/cardholderapi/**/controller/**</exclude>
+						<exclude>com/cardapp/cardholderapi/**/repository/**</exclude>
+						<exclude>com/cardapp/cardholderapi/**/handler/**</exclude>
+						<exclude>com/cardapp/cardholderapi/CardHolderApiApplication.class</exclude>
 					</excludes>
 				</configuration>
 				<executions>

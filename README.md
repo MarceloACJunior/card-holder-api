@@ -1,6 +1,6 @@
 # card-holder-api
 
-Microsserviço responsável pelo gerenciamento de portadores de cartão de crédito e seus cartões no ecossistema JazzTech.
+Microsserviço responsável pelo gerenciamento de portadores de cartão de crédito e seus cartões no ecossistema CardApp.
 
 ## Visão Geral
 
