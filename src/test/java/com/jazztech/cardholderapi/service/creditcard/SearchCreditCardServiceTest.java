@@ -4,11 +4,9 @@ import static com.jazztech.cardholderapi.service.cardholder.CardHolderFactory.ca
 import static com.jazztech.cardholderapi.service.creditcard.CreditCardFactory.creditCardEntityFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import com.jazztech.cardholderapi.controller.response.CreditCardResponse;
-import com.jazztech.cardholderapi.handler.exceptions.NoCreditCardsFoundException;
 import com.jazztech.cardholderapi.mapper.CreditCardMapper;
 import com.jazztech.cardholderapi.mapper.CreditCardMapperImpl;
 import com.jazztech.cardholderapi.repository.CreditCardRepository;
@@ -64,13 +62,14 @@ class SearchCreditCardServiceTest {
     }
 
     @Test
-    void should_throw_NoCreditCardsFoundException() {
+    void should_return_empty_list_when_no_cards_found() {
         when(creditCardRepository.findAllByCardHolderId(cardHolderIdCaptor.capture())).thenReturn(Collections.emptyList());
 
-        final NoCreditCardsFoundException exception = assertThrows(NoCreditCardsFoundException.class,
-                () -> searchCreditCardService.getAllCardsByCardHolderId(creditCardEntityFactory().getCardHolderId()));
+        final List<CreditCardResponse> result =
+                searchCreditCardService.getAllCardsByCardHolderId(creditCardEntityFactory().getCardHolderId());
 
-        assertEquals("No credit card found, check the clientId", exception.getMessage());
+        assertNotNull(result);
+        assertEquals(0, result.size());
     }
 
     @Test

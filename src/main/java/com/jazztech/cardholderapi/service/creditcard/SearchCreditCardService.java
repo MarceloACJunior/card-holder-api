@@ -1,7 +1,6 @@
 package com.jazztech.cardholderapi.service.creditcard;
 
 import com.jazztech.cardholderapi.controller.response.CreditCardResponse;
-import com.jazztech.cardholderapi.handler.exceptions.NoCreditCardsFoundException;
 import com.jazztech.cardholderapi.mapper.CreditCardMapper;
 import com.jazztech.cardholderapi.repository.CreditCardRepository;
 import com.jazztech.cardholderapi.repository.entity.creditcard.CreditCardEntity;
@@ -21,9 +20,6 @@ public class SearchCreditCardService {
 
     public List<CreditCardResponse> getAllCardsByCardHolderId(UUID cardHolderId) {
         final List<CreditCardEntity> creditCardEntities = creditCardRepository.findAllByCardHolderId(cardHolderId);
-        if (creditCardEntities.isEmpty()) {
-            throw new NoCreditCardsFoundException("No credit card found, check the clientId");
-        }
         return creditCardEntities.stream().map(creditCardMapper::responseFromEntity).toList();
     }
 
